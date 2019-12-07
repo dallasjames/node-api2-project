@@ -18,21 +18,23 @@ server.get("/api/posts", (req, res) => {
 })
 
 server.get("/api/posts/:id", (req, res) => {
-    db.findById(req.params.id)
+    const id = req.params.id;
+
+    db.findById(id)
         .then(post => {
             if (post) {
-                res.status(200).json(post)
+                res.status(200).json(post);
             } else {
                 res.status(404).json({ 
-                    message: "The post with the specified ID does not exist."
-                 })
+                    message: "Post with ID specified not found." 
+                });
             }
         })
-        .catch(err => {
+        .catch(error => {
             res.status(500).json({ 
                 error: "The post information could not be retrieved." 
-            })
-        })
+            });
+        });
 })
 
 server.get("/api/posts/:id/comments", (req, res) => {
@@ -82,7 +84,7 @@ server.post("/api/posts/:id/comments", (req, res) => {
         .then(post => {
           if (post.length > 0) {
             db.insertComment({ text: text, post_id: req.params.id })
-              .then(() => {
+              .then(text => {
                 res.status(201).json(text);
               })
               .catch(error => {
@@ -104,6 +106,28 @@ server.post("/api/posts/:id/comments", (req, res) => {
     } else {
       res.status(400).json({ errorMessage: "Please provide text for the comment." });
     }
+})
+
+server.delete("/api/posts/:id", (req, res) => {
+    const id = req.params.id
+
+    db.findById(id)
+        .then(post => {
+            if (post.length > 0) {
+                db.remove(id)
+                    .then(() => {
+                        res.status(200).json({ message: "Success" });
+                    })
+                    .catch(error => {
+                        res.status(500).json({ error: "The post could not be removed." });
+                    });
+            } else {
+                res.status(404).json({ message: "Post with ID specified not found." });
+            }
+        })
+        .catch(error => {
+            res.status(500).json({ error: "The post information could not be retrieved." });
+        });
 })
 
 server.listen(8080, () => {
