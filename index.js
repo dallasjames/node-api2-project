@@ -90,21 +90,21 @@ server.post("/api/posts/:id/comments", (req, res) => {
               .catch(error => {
                 res.status(500).json({ 
                     error: "There was an error while saving the comment to the database."
-                });
-              });
+                })
+              })
           } else {
             res.status(404).json({ 
                 message: "The post with the specified ID does not exist." 
-            });
+            })
           }
         })
         .catch(error => {
         res.status(500).json({ 
             error: "Post information could not be retrieved." 
-        });
-        });
+        })
+        })
     } else {
-      res.status(400).json({ errorMessage: "Please provide text for the comment." });
+      res.status(400).json({ errorMessage: "Please provide text for the comment." })
     }
 })
 
@@ -116,18 +116,54 @@ server.delete("/api/posts/:id", (req, res) => {
             if (post.length > 0) {
                 db.remove(id)
                     .then(() => {
-                        res.status(200).json({ message: "Success" });
+                        res.status(200).json({ message: "Success" })
                     })
                     .catch(error => {
-                        res.status(500).json({ error: "The post could not be removed." });
-                    });
+                        res.status(500).json({ error: "The post could not be removed." })
+                    })
             } else {
-                res.status(404).json({ message: "Post with ID specified not found." });
+                res.status(404).json({ message: "Post with ID specified not found." })
             }
         })
         .catch(error => {
-            res.status(500).json({ error: "The post information could not be retrieved." });
+            res.status(500).json({ error: "The post information could not be retrieved." })
         });
+})
+
+server.put("/api/posts/:id", (req, res) => {
+    const id = req.params.id;
+
+    const { title, contents } = req.body;
+
+    if (title && contents) {
+        db.update(id, { title: title, contents: contents })
+            .then(result => {
+                if (result) {
+                    db.findById(id)
+                        .then(post => {
+                            res.status(200).json(post)
+                        })
+                        .catch(error => {
+                            res.status(500).json({ 
+                                error: "There was an error retrieving post." 
+                            })
+                        })
+                } else {
+                    res.status(404).json({ 
+                        message: "Post with specified ID not found." 
+                })
+                }
+            })
+            .catch(error => {
+                res.status(500).json({ 
+                    error: "There was an error while saving the post to the database." 
+                })
+            });
+    } else {
+        res.status(400).json({ 
+            errorMessage: "Please provide title and contents for the post." 
+    })
+    }
 })
 
 server.listen(8080, () => {
