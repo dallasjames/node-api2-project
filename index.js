@@ -1,6 +1,8 @@
 const express = require("express")
 const cors = require("cors")
 const router =  require("./router/post-router")
+const port = process.env.PORT || 8080
+const host = process.env.HOST || "127.0.0.1"
 
 const server = express()
 
@@ -9,6 +11,6 @@ server.use(cors())
 
 server.use("/api/posts", router)
 
-server.listen(8080, () => {
-    console.log("\nRunning on port 8080\n")
+server.listen(port, host, () => {
+    console.log(`\nRunning on port ${port}\n`)
 })
