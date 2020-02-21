@@ -11,6 +11,6 @@ server.use(cors())
 
 server.use("/api/posts", router)
 
-server.listen(port, host, () => {
+server.listen(port, () => {
     console.log(`\nRunning on port ${port}\n`)
 })
